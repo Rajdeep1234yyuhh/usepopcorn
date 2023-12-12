@@ -50,30 +50,28 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 const key = "40f9305b";
-const s = "hnhnhn";
 
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const s = "hnhnhn";
   useEffect(function () {
     async function movieFetch() {
       try {
         setIsLoading(true);
         const res = await fetch(`http://www.omdbapi.com/?apikey=${key}&s=${s}`);
-        if (!res.ok) {
-          throw new Error("Fetching failed");
-        }
+        if (!res.ok) throw new Error("Fetching failed");
         const data = await res.json();
         console.log(data);
-        if (data.Response === "False") {
-          throw new Error("Movie not found!");
-        }
+        if (data.Response === "False") throw new Error("Movie not found!");
+
         setMovies(data.Search);
+        console.log(data);
       } catch (err) {
         console.log(err);
-        console.error(err.message);
+        console.error(err.message?);
         setError(err.message);
       } finally {
         setIsLoading(false);
