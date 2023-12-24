@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import StarRating from "./StarRating";
 
 const tempMovieData = [
   {
@@ -287,18 +288,19 @@ function WatchedMovies({ movie }) {
 }
 function MovieDetails({ selectedId, handleClose }) {
   const [movie, setMovie] = useState();
-  const {
-    Title: title,
-    Poster: poster,
-    Year: year,
-    Runtime: runtime,
-    imdbRating,
-    Released: released,
-    Plot: plot,
-    Actors: actors,
-    Director: director,
-    Genre: genre,
-  } = movie;
+
+  // const {
+  //   Title: title,
+  //   Poster: poster,
+  //   Year: year,
+  //   Runtime: runtime,
+  //   imdbRating,
+  //   Released: released,
+  //   Plot: plot,
+  //   Actors: actors,
+  //   Director: director,
+  //   Genre: genre,
+  // } = movie;
 
   useEffect(
     function () {
@@ -308,37 +310,42 @@ function MovieDetails({ selectedId, handleClose }) {
         );
         const data = await res.json();
         setMovie(data);
-        console.log(data);
       }
       getMovieDetails();
     },
     [selectedId]
   );
+
   return (
-    <div className="details">
-      <header>
+    // <div className="details">
+    <>
+      {/* <header>
         <button className="btn-back" onClick={handleClose}>
           &larr;
         </button>
-        <img src={poster} alt={`poster of the movie ${movie}`} />
+         <img src={movie.Poster} alt={`poster of the movie ${movie}`} /> 
         <div className="details-overview">
-          <h2>{title}</h2>
+          <h2>{movie.Title}</h2>
           <p>
-            {released} &bull; {runtime}
+            {movie.Released} &bull; {movie.Runtime}
           </p>
           <p>
             <span>⭐</span>
-            {imdbRating} IMDb rating
+            {movie.imdbRating} IMDb rating
           </p>
         </div>
-      </header>
+      </header> 
       <section>
-        <p>
-          <em>{plot}</em>
-        </p>
-        <p>Starring {actors}</p>
-        <p>Directed by {director}</p>
-      </section>
-    </div>
+    //     <p>
+    //       <em>{plot}</em>
+    //     </p>
+    //     <p>Starring {actors}</p>
+    //     <p>Directed by {director}</p>
+    //   </section>
+    // </div> */}
+      <button onClick={handleClose}> Back &larr;</button>
+      <div>{selectedId}</div>
+      <StarRating maxRating={7} />
+    </>
   );
 }
