@@ -59,11 +59,18 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState(null);
+
   function handleSelect(id) {
     setSelectedId((sid) => (id === sid ? null : id));
   }
   function handleClose() {
     setSelectedId(null);
+  }
+  function handleWatch(movie) {
+    setWatched((watched) => [...watched, movie]);
+  }
+  function handleDelete(id) {
+    setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
   useEffect(
     function () {
@@ -110,11 +117,19 @@ export default function App() {
         </Box>
         <Box>
           {selectedId ? (
-            <MovieDetails selectedId={selectedId} handleClose={handleClose} />
+            <MovieDetails
+              selectedId={selectedId}
+              handleClose={handleClose}
+              handleWatch={handleWatch}
+              watched={watched}
+            />
           ) : (
             <>
               <WatchedSummery watched={watched} />
-              <WatchedMoviesList watched={watched} />
+              <WatchedMoviesList
+                watched={watched}
+                handleDelete={handleDelete}
+              />
             </>
           )}
         </Box>
@@ -183,7 +198,7 @@ function Box({ children }) {
     </div>
   );
 }
-function MovieList({ movies, handleSelect }) {
+function MovieList({ movies, handleSelect, handleDelete }) {
   return (
     <ul className="list list-movies" style={{ overflow: "hidden" }}>
       {movies?.map((movie) => (
@@ -245,7 +260,7 @@ function WatchedSummery({ watched }) {
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(2)}</span>
         </p>
         <p>
           <span>⏳</span>
@@ -255,16 +270,20 @@ function WatchedSummery({ watched }) {
     </div>
   );
 }
-function WatchedMoviesList({ watched }) {
+function WatchedMoviesList({ watched, handleDelete }) {
   return (
     <ul className="list" style={{ overflow: "hidden" }}>
       {watched.map((movie) => (
-        <WatchedMovies movie={movie} key={movie.imdbID} />
+        <WatchedMovies
+          movie={movie}
+          key={movie.imdbID}
+          handleDelete={handleDelete}
+        />
       ))}
     </ul>
   );
 }
-function WatchedMovies({ movie }) {
+function WatchedMovies({ movie, handleDelete }) {
   return (
     <li>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
@@ -282,13 +301,23 @@ function WatchedMovies({ movie }) {
           <span>⏳</span>
           <span>{movie.runtime} min</span>
         </p>
+        <button
+          className="btn-delete"
+          onClick={() => handleDelete(movie.imdbID)}
+        >
+          ❌
+        </button>
       </div>
     </li>
   );
 }
-function MovieDetails({ selectedId, handleClose }) {
+function MovieDetails({ selectedId, handleClose, handleWatch, watched }) {
   const [movie, setMovie] = useState();
-
+  const [userRating, setUserRating] = useState();
+  const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
+  const uuserRating = watched.find(
+    (movie) => movie.imdbID === selectedId
+  )?.userRating;
   // const {
   //   Title: title,
   //   Poster: poster,
@@ -315,6 +344,14 @@ function MovieDetails({ selectedId, handleClose }) {
     },
     [selectedId]
   );
+  function handleAdd() {
+    const newMovie = {
+      imdbID: selectedId,
+      userRating,
+    };
+    handleWatch(newMovie);
+    handleClose();
+  }
 
   return (
     // <div className="details">
@@ -345,7 +382,20 @@ function MovieDetails({ selectedId, handleClose }) {
     // </div> */}
       <button onClick={handleClose}> Back &larr;</button>
       <div>{selectedId}</div>
-      <StarRating maxRating={7} />
+      {!isWatched ? (
+        <>
+          <StarRating maxRating={6} size={52} setMovieRating={setUserRating} />
+          {userRating > 0 && (
+            <button className="btn-add" onClick={handleAdd}>
+              + Add to list
+            </button>
+          )}
+        </>
+      ) : (
+        <p>
+          Already rated this movie {uuserRating} <span>⭐</span>
+        </p>
+      )}
     </>
   );
 }
